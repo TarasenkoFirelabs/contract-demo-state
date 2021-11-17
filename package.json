@@ -1,0 +1,81 @@
+{
+  "name": "app-contract-call",
+  "description": "NEAR Apps Contract\n\nThis project contains implementation of log backed by blockchain, written in Rust.",
+  "version": "0.1.0",
+  "license": "(MIT AND Apache-2.0)",
+  "scripts": {
+    "build": "yarn build:contract && yarn build:web",
+    "build:contract": "yarn build:contract:app && yarn build:contract:make_wallet && yarn build:contract:nft",
+    "postbuild:contract": "cp ../contract/target/wasm32-unknown-unknown/release/*.wasm res/",
+    "deploy:contract": "yarn deploy:contract:app && yarn deploy:contract:make_wallet && yarn deploy:contract:nft",
+    "postdeploy:contract": "source .env.local && near call $NEXT_PUBLIC_CONTRACT_NAME add_contract '{\"contract_name\": \"'$NEXT_PUBLIC_CONTRACT_NAME_MAKE_WALLET'\"}' --accountId $NEXT_PUBLIC_CONTRACT_NAME && echo 'NODE_ENV=testnet' >> .env && echo 'NEXT_PUBLIC_NODE_ENV=testnet' >> .env.local",
+    "build:contract:app": "set -e & cd ../contract/app && RUSTFLAGS='-C link-arg=-s' cargo build --target wasm32-unknown-unknown --release",
+    "build:contract:make_wallet": "set -e & cd ../contract/app-wallet-creation && RUSTFLAGS='-C link-arg=-s' cargo build --target wasm32-unknown-unknown --release",
+    "build:contract:nft": "set -e & cd ../contract/app-nft && RUSTFLAGS='-C link-arg=-s' cargo build --target wasm32-unknown-unknown --release",
+    "deploy:contract:app": "near dev-deploy res/app.wasm --init && cp ./neardev/dev-account.env .env && echo '' >> .env && source .env && echo 'NEXT_PUBLIC_CONTRACT_NAME='$CONTRACT_NAME > .env.local && echo '' >> .env.local",
+    "deploy:contract:make_wallet": "source .env && near create-account make-wallet.$CONTRACT_NAME --initialBalance 10 --masterAccount $CONTRACT_NAME && near deploy make-wallet.$CONTRACT_NAME --wasmFile res/app_wallet_creation.wasm && echo 'NEXT_PUBLIC_CONTRACT_NAME_MAKE_WALLET=make-wallet.'$CONTRACT_NAME >> .env.local",
+    "deploy:contract:nft": "source .env && near create-account app_nft.$CONTRACT_NAME --initialBalance 10 --masterAccount $CONTRACT_NAME && near deploy app_nft.$CONTRACT_NAME --wasmFile res/app_nft.wasm && echo 'NEXT_PUBLIC_CONTRACT_NAME_NFT=nft.'$CONTRACT_NAME >> .env.local",
+    "build:web": "next build",
+    "deploy": "yarn build && yarn deploy:contract && gh-pages -d dist/",
+    "dev": "yarn build:contract && yarn deploy:contract && yarn dev:web",
+    "dev:web": "next dev",
+    "lint": "next lint",
+    "start": "yarn deploy && next start",
+    "test": "yarn build:contract && asp && jest"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^4.7.0",
+    "@types/node": "^16.11.6",
+    "@types/react": "^17.0.34",
+    "@zeit/next-sass": "^1.0.1",
+    "antd": "^4.16.13",
+    "big.js": "^6.1.1",
+    "mobx": "^6.3.6",
+    "mobx-react": "^7.2.1",
+    "near-api-js": "^0.43.1",
+    "near-seed-phrase": "^0.2.0",
+    "next": "12.0.2",
+    "prop-types": "^15.7.2",
+    "react": "17.0.2",
+    "react-alert": "^7.0.3",
+    "react-dom": "17.0.2",
+    "regenerator-runtime": "^0.13.7"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.0",
+    "@babel/plugin-proposal-decorators": "^7.16.0",
+    "@babel/preset-env": "^7.14.2",
+    "@babel/preset-react": "^7.13.13",
+    "@parcel/transformer-sass": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.22.1",
+    "@typescript-eslint/parser": "^4.22.1",
+    "eslint": "7.32.0",
+    "eslint-config-next": "12.0.2",
+    "gh-pages": "^3.1.0",
+    "near-cli": "^2.0.0",
+    "near-sdk-as": "3.2.3",
+    "react-test-renderer": "^17.0.2",
+    "sass": "^1.32.13",
+    "typescript": "^4.2.4"
+  },
+  "resolutions": {
+    "@babel/preset-env": "7.13.8"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false
+  }
+}
