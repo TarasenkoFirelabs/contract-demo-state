@@ -1,0 +1,17 @@
+[package]
+name = "app"
+version = "0.1.0"
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+near-sdk = "4.0.0-pre.2"
+base64 = "0.13.0"
+
+[dev-dependencies]
+near-sdk-sim = "4.0.0-pre.2"
+app-wallet-creation = { path="../app-wallet-creation"}
+
+

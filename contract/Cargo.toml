@@ -1,15 +1,9 @@
-[package]
-name = "api-call"
-version = "0.1.0"
-authors = ["Nino <n.lipartiia@4irelabs.com>"]
-edition = "2018"
-
-[lib]
-crate-type = ["cdylib"]
-
-[dependencies]
-near-sdk = "4.0.0-pre.2"
-base64 = "0.13.0"
+[workspace]
+members = [
+    "app",
+    "app-nft",
+    "app-wallet-creation",
+]
 
 [profile.release]
 codegen-units = 1
